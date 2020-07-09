@@ -15,7 +15,7 @@ namespace Robot.Common
         {
             Name = "Rover",
             StartPosition = new RobotStartPosition { X = 10, Y = 10 },
-            StartDirection = Enms.Direction.North
+            StartDirection = Enms.Direction.N
         };
 
     }

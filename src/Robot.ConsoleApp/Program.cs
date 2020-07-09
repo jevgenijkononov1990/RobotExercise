@@ -20,11 +20,12 @@ namespace Robot.ConsoleApp
             {
                 LogManager.Configure("log4net.config"); 
                 ServiceProvider serviceProvider = StartUp.BuildServiceProvider();
-                _log.Message(LogLevel.Info, "Robot Robert started.......");
+                _log.Message(LogLevel.Info, "Robot is about to  start.......");
                 Console.CancelKeyPress += new ConsoleCancelEventHandler(Console_CancelKeyPress);
 
-                serviceProvider.GetService<IMianRobotService>().
-                    .HandleInputAsync(_cancellationTokenSource);
+                var robot = serviceProvider.GetService<IMainRobotService>();
+                robot.InitializeFramework();
+                robot.StartCommunicationThreadAsync(_cancellationTokenSource);
 
                 Console.CancelKeyPress -= new ConsoleCancelEventHandler(Console_CancelKeyPress);
 

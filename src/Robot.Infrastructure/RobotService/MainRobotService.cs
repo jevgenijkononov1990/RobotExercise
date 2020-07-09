@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Robot.Infrastructure.RobotService
 {
-    public class MainRobotService : IMianRobotService
+    public class MainRobotService : IMainRobotService
     {
         private static readonly ILogger _log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly ICommunicationHandler _communicationHandler;
@@ -26,7 +26,7 @@ namespace Robot.Infrastructure.RobotService
             _robotSettings = robotSettings ?? throw new ArgumentNullException($"{GetType().Name} {RobotConstantsValues.ConstructorInitFailure} {nameof(robotSettings)}");
         }
 
-        public bool InitializeRobotFramework()
+        public bool InitializeFramework()
         {
             try
             {
@@ -42,6 +42,7 @@ namespace Robot.Infrastructure.RobotService
 
                     _robotConfig = RobotConstantsValues.RobotDefaultCongifs;
                 }
+                Console.WriteLine($"Robot {_robotConfig.Name} init success! Start options: ${_robotConfig.StartPosition.X}:{_robotConfig.StartPosition.Y}:{_robotConfig.StartDirection}");
             }
             catch (Exception ex)
             {
@@ -54,7 +55,7 @@ namespace Robot.Infrastructure.RobotService
             return true;
         }
 
-        public async Task StartRobotFrameworkThreadAsync(CancellationTokenSource cancellationTokenSource)
+        public async Task StartCommunicationThreadAsync(CancellationTokenSource cancellationTokenSource)
         {
             if (cancellationTokenSource == null)
             {
