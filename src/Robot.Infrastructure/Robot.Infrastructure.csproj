@@ -5,9 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="CommunicationService\" />
-    <Folder Include="NewFolder\" />
-    <Folder Include="RobotService\" />
+    <ProjectReference Include="..\Robot.Common\Robot.Common.csproj" />
   </ItemGroup>
 
 </Project>
