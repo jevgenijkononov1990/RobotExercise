@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Robot.Common.Logging;
+using Robot.Common.Models;
 
 namespace Robot.Infrastructure.Communication
 {
@@ -16,9 +17,9 @@ namespace Robot.Infrastructure.Communication
 
         }
 
-        (bool success, List<string> cmds) ReadCommand(string txtToCmd)
+        public (bool success, List<RobotCommandView> robotCommands) ConvertInputToCommand(string txtToCmd)
         {
-            return (false, null);
+            throw new NotImplementedException();
         }
     }
 }

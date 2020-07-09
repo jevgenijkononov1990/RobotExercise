@@ -5,7 +5,9 @@ using Robot.Common.Models;
 using Robot.ConsoleApp.Helpers;
 
 using Robot.Infrastructure.Communication;
+using Robot.Infrastructure.RobotService;
 using Robot.Infrastructure.Settings;
+using Robot.Infrastructure.StateMachine;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -35,16 +37,17 @@ namespace Robot.ConsoleApp
         }
 
         #region Dependency Injection Initialization
+
         private static IServiceCollection CreateServices()
         {
             var service = new ServiceCollection();
 
             string evn = "development";
-            #if DEBUG
+#if DEBUG
 
-            #else
+#else
                 evn = ""
-            #endif
+#endif
 
             RegisterService(service, evn);
 
@@ -59,9 +62,8 @@ namespace Robot.ConsoleApp
                 jsonFile.Replace("..", "");
             }
 
-
             IConfigurationBuilder configBuilder = new ConfigurationBuilder()
-  //              .SetBasePath(Directory.GetCurrentDirectory())
+                //              .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile(jsonFile, optional: false, reloadOnChange: true)
                 .AddEnvironmentVariables();
             var configuration = configBuilder.Build();
@@ -69,13 +71,14 @@ namespace Robot.ConsoleApp
             services.AddTransient(typeof(IOptionsFactory<>), typeof(ValidatableOptionsFactory<>));
             services.AddOptions();
             services.AddSingleton<IConfiguration>(configuration);
-
             services.Configure<RobotConfig>(configuration.GetSection("RobotConfig"));
             services.AddSingleton<ICommunicationHandler, CommunicationHandler>();
             services.AddSingleton<IRobotRepoSettings, RobotRepoSettings>();
+            services.AddSingleton<ICommunicationHandler, CommunicationHandler>();
+            services.AddSingleton<IMainRobotService, MainRobotService>();
+            services.AddSingleton<IRobotStateMachineFactory, RobotStateMachineFactory>();
 
+            #endregion
         }
-
-        #endregion
     }
 }

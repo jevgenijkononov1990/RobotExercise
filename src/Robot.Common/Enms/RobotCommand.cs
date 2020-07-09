@@ -6,6 +6,7 @@ namespace Robot.Common.Enms
 {
     public enum RobotCommand
     {
+        Initialization,
         MoveRight,
         MoveLeft,
         MoveStraight,
@@ -13,5 +14,8 @@ namespace Robot.Common.Enms
         TurnARound,
         RotateLeft,
         RotateRight,
+        Diagonally,
+        Vertically,
+        Horizontally
     }
 }

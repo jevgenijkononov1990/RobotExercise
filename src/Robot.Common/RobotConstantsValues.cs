@@ -10,6 +10,7 @@ namespace Robot.Common
         public static readonly string ConstructorInitFailure = "Constructor Initialization failure due to:";
         public static readonly string CriticalErrorOccuredMissionWillContinue = "Robot has encountered critical error. Mission will be continued, but with a risk of losing data";
         public static readonly string CriticalErrorOccuredMissionWillNotContinue = "Robot has encountered critical error and requires program termination or restart";
+        public static readonly string CommunicationError = "Robot has encountered communication error";
 
         public static RobotConfig RobotDefaultCongifs = new RobotConfig
         {

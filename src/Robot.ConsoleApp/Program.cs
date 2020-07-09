@@ -1,8 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Robot.Common.Logging;
-using Robot.Infrastructure.Communication;
 using Robot.Infrastructure.RobotService;
-using Robot.Infrastructure.Settings;
 using System;
 using System.Reflection;
 using System.Threading;
@@ -13,22 +11,16 @@ namespace Robot.ConsoleApp
     {
         private static readonly ILogger _log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        private static ServiceProvider _serviceProvider;
 
         static void Main(string[] args)
         {
             try
             {
-                LogManager.Configure("log4net.config"); 
-                ServiceProvider serviceProvider = StartUp.BuildServiceProvider();
-                _log.Message(LogLevel.Info, "Robot is about to  start.......");
+                InitProgramSettings();          
                 Console.CancelKeyPress += new ConsoleCancelEventHandler(Console_CancelKeyPress);
-
-                var robot = serviceProvider.GetService<IMainRobotService>();
-                robot.InitializeFramework();
-                robot.StartCommunicationThreadAsync(_cancellationTokenSource);
-
+                InitRobotFramework();
                 Console.CancelKeyPress -= new ConsoleCancelEventHandler(Console_CancelKeyPress);
-
             }
             catch(Exception ex)
             {
@@ -38,6 +30,25 @@ namespace Robot.ConsoleApp
             }
         }
 
+        #region ProgramInit
+
+        static void InitProgramSettings()
+        {
+            LogManager.Configure("log4net.config");
+            _serviceProvider = StartUp.BuildServiceProvider();
+            _log.Message(LogLevel.Info, "Robot is about to  start.......");
+        }
+
+        static void InitRobotFramework()
+        {
+            var robot = _serviceProvider.GetService<IMainRobotService>();
+            robot.InitializeFramework();
+            robot.StartCommunicationThreadAsync(_cancellationTokenSource);
+        }
+
+        #endregion
+
+        #region CTRL + C exit handler
         static void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
         {
             Console.WriteLine("Cancelling");
@@ -50,6 +61,6 @@ namespace Robot.ConsoleApp
                 Environment.Exit(0);
             }
         }
-
+        #endregion
     }
 }
