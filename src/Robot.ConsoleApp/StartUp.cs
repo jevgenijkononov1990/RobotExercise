@@ -8,6 +8,7 @@ using Robot.Infrastructure.Communication;
 using Robot.Infrastructure.RobotService;
 using Robot.Infrastructure.Settings;
 using Robot.Infrastructure.StateMachine;
+using Robot.Infrastructure.StateMachine.LocationControl;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -69,15 +70,17 @@ namespace Robot.ConsoleApp
             var configuration = configBuilder.Build();
 
             services.AddTransient(typeof(IOptionsFactory<>), typeof(ValidatableOptionsFactory<>));
-            services.AddOptions();
             services.AddSingleton<IConfiguration>(configuration);
             services.Configure<RobotConfig>(configuration.GetSection("RobotConfig"));
+            services.AddOptions();
+
             services.AddSingleton<ICommunicationHandler, CommunicationHandler>();
             services.AddSingleton<IRobotRepoSettings, RobotRepoSettings>();
             services.AddSingleton<ICommunicationHandler, CommunicationHandler>();
             services.AddSingleton<IMainRobotService, MainRobotService>();
             services.AddSingleton<IRobotStateMachineFactory, RobotStateMachineFactory>();
-
+            services.AddSingleton<IRobotLocationService, RobotLocationService>();
+        
             #endregion
         }
     }

@@ -1,4 +1,5 @@
-﻿using Robot.Common;
+﻿using Newtonsoft.Json;
+using Robot.Common;
 using Robot.Common.Enms;
 using Robot.Common.Logging;
 using Robot.Common.Models;
@@ -8,7 +9,6 @@ using Robot.Infrastructure.StateMachine;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,7 +21,6 @@ namespace Robot.Infrastructure.RobotService
         private readonly IRobotRepoSettings _robotSettings;
         private readonly IRobotStateMachineFactory  _robotStateMachine;
         private RobotConfig _robotConfig;
-
 
         public MainRobotService(ICommunicationHandler communicationHandler, IRobotRepoSettings robotSettings, IRobotStateMachineFactory robotStateMachine)
         {
@@ -40,20 +39,33 @@ namespace Robot.Infrastructure.RobotService
             try
             {
                 _robotConfig = _robotSettings.GetEnviromentSettings();
-                if (_robotConfig == null
-                    || string.IsNullOrWhiteSpace(_robotConfig.Name)
-                    || _robotConfig.StartPosition == null
-                    || _robotConfig.StartPosition?.X < 0
-                    || _robotConfig.StartPosition?.Y < 0
-                    || !Enum.IsDefined(typeof(Direction), _robotConfig.StartDirection))
+                if (_robotConfig == null || _robotConfig.MatrixSize == null || _robotConfig.Position == null)
                 {
                     _log.Message(LogLevel.Warn, "Default settings will be applied, Config Settings read error");
 
                     _robotConfig = RobotConstantsValues.RobotDefaultCongifs;
                 }
 
-                Console.WriteLine($"Robot {_robotConfig.Name} init success! Start settings :---> [{_robotConfig.StartPosition.X}:{_robotConfig.StartPosition.Y}:{_robotConfig.StartDirection}]");
-            }
+                Console.WriteLine($"Robot {_robotConfig.Name} init success!");
+                Console.WriteLine($"Start position :---> [{ _robotConfig.Position.X}:{ _robotConfig.Position.Y}:{ _robotConfig.Position.Direction}]");
+                Console.WriteLine($"Matrix settings :---> [{ _robotConfig.MatrixSize.Max_X_Value}:{ _robotConfig.MatrixSize.Max_Y_Value}]");
+
+                RobotCommandView robotView = new RobotCommandView
+                {
+                    OriginalText = "Init",
+                    QueueId = 0, 
+                    Command = RobotCommand.Initialization,
+                    CurentDirection = _robotConfig.Position.Direction,
+                    MoveTo =  new MatrixLocation
+                    {
+                        X = _robotConfig.Position.X,
+                        Y = _robotConfig.Position.Y,
+                    } 
+
+                };
+                var cmdResult = _robotStateMachine.Build(robotView.Command).MakeStep(robotView, new MatrixSize { });
+        
+    }
             catch (Exception ex)
             {
                 Console.WriteLine(RobotConstantsValues.CriticalErrorOccuredMissionWillContinue);
@@ -85,7 +97,7 @@ namespace Robot.Infrastructure.RobotService
                     {
                         if( response.robotCommands != null && response.robotCommands.Count > 0)
                         {
-                            //call state machine
+                            ProceedRobotCommands(response.robotCommands);
                         }
                     }
                     else
@@ -103,9 +115,30 @@ namespace Robot.Infrastructure.RobotService
 
         private void ProceedRobotCommands(List<RobotCommandView> cmdList)
         {
+            int counter = 0;
             foreach(var item in cmdList)
             {
-                _robotStateMachine.Build(item.Cmd).MakeStep(item);
+                item.QueueId = counter;
+                try
+                {
+                    var result = _robotStateMachine.Build(item.Command).MakeStep(item);
+
+                    if (result.isSuccess && result.currentPosition !=null)
+                    {
+                        Console.WriteLine($"Success! Position was changed to: [{result.currentPosition.X}:{result.currentPosition.X}:{result.currentPosition.Direction}]");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Position was not changed");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _log.Exception(ex, $"Robot command critical failure: {JsonConvert.SerializeObject(item)}");
+                    Console.WriteLine($"{RobotConstantsValues.CommandFailure}: {JsonConvert.SerializeObject(item)}");
+                }
+
+                counter++;
             }
         }
     }

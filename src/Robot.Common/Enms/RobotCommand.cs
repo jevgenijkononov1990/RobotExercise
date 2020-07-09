@@ -1,20 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿
 namespace Robot.Common.Enms
 {
     public enum RobotCommand
     {
         Initialization,
+
         MoveRight,
         MoveLeft,
         MoveStraight,
         MoveBack,
-        TurnARound,
+
+        //TurnARound,
         RotateLeft,
         RotateRight,
-        Diagonally,
+
+        //Diagonally,
+
         Vertically,
         Horizontally
     }

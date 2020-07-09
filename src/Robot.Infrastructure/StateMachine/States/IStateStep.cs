@@ -4,6 +4,6 @@ namespace Robot.Infrastructure.StateMachine.States
 {
     public interface IStateStep
     {
-        bool MakeStep(RobotCommandView robotCommandView);
+        (bool isSuccess, RobotPosition currentPosition) MakeStep(RobotCommandView robotCommandView, MatrixSize matrixSize = null);
     }
 }
