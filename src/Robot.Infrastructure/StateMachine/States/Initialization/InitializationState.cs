@@ -14,7 +14,7 @@ namespace Robot.Infrastructure.StateMachine.States
             _locationService = locationService ?? throw new ArgumentNullException($"{GetType().Name} {RobotConstantsValues.ConstructorInitFailure} {nameof(locationService)}");
         }
 
-        (bool isSuccess, RobotResponse robotResponse) IState.ProcessState(RobotCommand robotCommand, MatrixSize matrixSize)
+        (bool isSuccess, StateResponse stateResponse) IState.ProcessState(RobotCommand robotCommand, MatrixSize matrixSize)
         {
    
             if (robotCommand == null || matrixSize == null || robotCommand.MoveTo == null)
@@ -24,7 +24,7 @@ namespace Robot.Infrastructure.StateMachine.States
 
             if (_locationService.SetupWorkingMatrix(matrixSize) == false)
             {
-                return (false, new RobotResponse
+                return (false, new StateResponse
                 {
                     CurrentPosition = _locationService.GetCurrentRobotPosition()
                 });
@@ -32,7 +32,7 @@ namespace Robot.Infrastructure.StateMachine.States
 
             var result = _locationService.SetPosition(robotCommand.MoveTo.X, robotCommand.MoveTo.Y, robotCommand.CurentDirection);
 
-            return (result, new RobotResponse
+            return (result, new StateResponse
             {
                 CurrentPosition = _locationService.GetCurrentRobotPosition()
             });

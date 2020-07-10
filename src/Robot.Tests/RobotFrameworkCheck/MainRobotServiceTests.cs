@@ -103,9 +103,9 @@ namespace Robot.Tests.RobotFrameworkCheck
             Assert.False(result);
         }
 
-        private (bool success, RobotResponse response) DemoResult(bool resultValue = false, bool initObject = false)
+        private (bool success, StateResponse response) DemoResult(bool resultValue = false, bool initObject = false)
         {
-            return (resultValue, initObject == true? new RobotResponse(): null);
+            return (resultValue, initObject == true? new StateResponse(): null);
         }
 
         [Fact]

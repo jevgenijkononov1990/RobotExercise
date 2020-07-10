@@ -66,9 +66,9 @@ namespace Robot.Infrastructure.RobotService
 
                 var cmdResult = _robotStateMachine.Build(RobotCommandType.Initialization).ProcessState(command, _robotConfig.MatrixSize);
 
-                if (cmdResult.isSuccess && cmdResult.robotResponse!=null && cmdResult.robotResponse.CurrentPosition!=null)
+                if (cmdResult.isSuccess && cmdResult.stateResponse != null && cmdResult.stateResponse.CurrentPosition!=null)
                 {
-                    _currentPosition = cmdResult.robotResponse.CurrentPosition;
+                    _currentPosition = cmdResult.stateResponse.CurrentPosition;
                 }
 
                 _log.Message(LogLevel.Info, cmdResult.isSuccess ? $"{RobotCommandType.Initialization} Success" : $"{RobotCommandType.Initialization} Failure");
@@ -131,10 +131,10 @@ namespace Robot.Infrastructure.RobotService
                     Console.WriteLine($"Request command:{cmd.Type}: Direction:{cmd.CurentDirection} request new Position({cmd.MoveTo.X}:{cmd.MoveTo.Y})");
                     var result = _robotStateMachine.Build(cmd.Type).ProcessState(cmd);
 
-                    if (result.isSuccess && result.robotResponse !=null)
+                    if (result.isSuccess && result.stateResponse != null)
                     {
-                        _currentPosition = result.robotResponse.CurrentPosition;
-                        Console.WriteLine($"Success! Position was changed to: [{result.robotResponse.CurrentPosition.X}:{result.robotResponse?.CurrentPosition.Y}:{result.robotResponse?.CurrentPosition.Direction}]");
+                        _currentPosition = result.stateResponse.CurrentPosition;
+                        Console.WriteLine($"Success! Position was changed to: [{result.stateResponse.CurrentPosition.X}:{result.stateResponse?.CurrentPosition.Y}:{result.stateResponse?.CurrentPosition.Direction}]");
                     }
                     else
                     {

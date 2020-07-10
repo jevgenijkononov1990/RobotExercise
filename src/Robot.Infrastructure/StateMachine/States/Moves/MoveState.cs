@@ -14,16 +14,16 @@ namespace Robot.Infrastructure.StateMachine.States.Moves
             _locationService = locationService ?? throw new ArgumentNullException($"{GetType().Name} {RobotConstantsValues.ConstructorInitFailure} {nameof(locationService)}");
         }
 
-        public (bool isSuccess, RobotResponse robotResponse) ProcessState(RobotCommand robotCommand, MatrixSize matrixSize = null)
+        public (bool isSuccess, StateResponse stateResponse) ProcessState(RobotCommand robotCommand, MatrixSize matrixSize = null)
         {
-            if (robotCommand == null  || robotCommand.MoveTo == null)
+            if (robotCommand == null || robotCommand.MoveTo == null)
             {
                 return (false, null);
             }
 
             bool result = _locationService.SetPosition(robotCommand.MoveTo.X, robotCommand.MoveTo.Y, robotCommand.CurentDirection);
 
-            return (result, new RobotResponse { CurrentPosition = _locationService.GetCurrentRobotPosition()});
+            return (result, new StateResponse { CurrentPosition = _locationService.GetCurrentRobotPosition() });
         }
     }
 }
