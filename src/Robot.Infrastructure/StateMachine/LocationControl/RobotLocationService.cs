@@ -4,6 +4,7 @@ using Robot.Common.Logging;
 using Robot.Common.Models;
 using Robot.Infrastructure.StateMachine.LocationControl;
 using System;
+using System.ComponentModel;
 using System.Reflection;
 
 namespace Robot.Infrastructure.StateMachine
@@ -45,7 +46,7 @@ namespace Robot.Infrastructure.StateMachine
 
             if (!Enum.IsDefined(typeof(Direction), direction))
             {
-                throw new ArgumentOutOfRangeException();
+                throw new InvalidEnumArgumentException();
             }
 
             if (GeneralValidationHelper.IsIntegerValueNegative(x) || GeneralValidationHelper.IsIntegerValueNegative(y))
