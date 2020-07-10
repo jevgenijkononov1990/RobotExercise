@@ -5,10 +5,12 @@ using Robot.Common.Models;
 using Robot.ConsoleApp.Helpers;
 
 using Robot.Infrastructure.Communication;
+using Robot.Infrastructure.Communication.Decoders;
 using Robot.Infrastructure.RobotService;
 using Robot.Infrastructure.Settings;
 using Robot.Infrastructure.StateMachine;
 using Robot.Infrastructure.StateMachine.LocationControl;
+using Robot.Infrastructure.StateMachine.LocationHelpers;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -80,7 +82,9 @@ namespace Robot.ConsoleApp
             services.AddSingleton<IMainRobotService, MainRobotService>();
             services.AddSingleton<IRobotStateMachineFactory, RobotStateMachineFactory>();
             services.AddSingleton<IRobotLocationService, RobotLocationService>();
-        
+            services.AddSingleton<IDecoder, RotationCommandDecoder>();
+            services.AddSingleton<ILocationHelperProcessor, LocationHelperProcessor>();
+
             #endregion
         }
     }

@@ -4,7 +4,6 @@ using Robot.Common.Logging;
 using Robot.Common.Models;
 using Robot.Infrastructure.StateMachine.LocationControl;
 using System;
-using System.Linq;
 using System.Reflection;
 
 namespace Robot.Infrastructure.StateMachine
@@ -17,11 +16,14 @@ namespace Robot.Infrastructure.StateMachine
         private static readonly ILogger _log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private MatrixSize _workingMatrixSize { get; set; }
         private RobotPosition _currentPosition { get; set; }
+        private bool _setupPostionFirstTime { get; set; } = true;
+
 
         public RobotLocationService()
         {
             _currentPosition = new RobotPosition { X = 0 , Y = 0 , Direction = Direction.N };
             _workingMatrixSize = new MatrixSize();
+          
         }
 
         public bool SetupWorkingMatrix(MatrixSize matrixSize)
@@ -51,16 +53,26 @@ namespace Robot.Infrastructure.StateMachine
                 return false;
             }
 
+            if (!GeneralValidationHelper.IsWithin(x, _workingMatrixSize.Min_Y_Value, _workingMatrixSize.Max_Y_Value))
+            {
+                return false;
+            }
+
+            if (!GeneralValidationHelper.IsWithin(y, _workingMatrixSize.Min_X_Value, _workingMatrixSize.Max_X_Value))
+            {
+                return false;
+            }
+
             switch (direction)
             {
                 case Direction.N: // y++
-                    return PocessNorthDirection(x, y, direction);
+                    return ProcessNorthDirection(x, y, direction);
                 case Direction.S: // y--
-                    return PocessSouthDirection(x, y, direction);
+                    return ProcessSouthDirection(x, y, direction);
                 case Direction.E: //x++
-                    return PocessEestDirection(x, y, direction);
+                    return ProcessEastDirection(x, y, direction);
                 case Direction.W: //x--
-                    return PocessWestDirection(x, y, direction);
+                    return ProcessWestDirection(x, y, direction);
                 default:
                     throw new NotImplementedException();
             }
@@ -78,60 +90,88 @@ namespace Robot.Infrastructure.StateMachine
 
         #region LocationProcessors
 
-        private bool PocessNorthDirection(int x, int y, Direction direction)  // y++
+        public bool ProcessNorthDirection(int x, int y, Direction direction)  // y++
         {
-            var temp = _currentPosition.Y + y;
+            //int tempY = _currentPosition.Y + y;
+            int tempY = y;
 
-            if (!GeneralValidationHelper.IsWithin(temp, _workingMatrixSize.Min_Y_Value, _workingMatrixSize.Max_Y_Value))
+            if (!GeneralValidationHelper.IsWithin(tempY, _workingMatrixSize.Min_Y_Value, _workingMatrixSize.Max_Y_Value))
             {
                 return false;
             }
 
-            _currentPosition.Y = temp;
+            if (!GeneralValidationHelper.IsWithin(x, _workingMatrixSize.Min_X_Value, _workingMatrixSize.Max_X_Value))
+            {
+                return false;
+            }
+
+            _currentPosition.X = x;
+            _currentPosition.Y = tempY;
             _currentPosition.Direction = direction;
 
             return true;
         }
 
-        private bool PocessEestDirection(int x, int y, Direction direction)  //x++
+        public bool ProcessEastDirection(int x, int y, Direction direction)  //x++
         {
-            var temp = _currentPosition.X + x;
+            //int temp = _currentPosition.X + x;
+            int temp =  x;
 
             if (!GeneralValidationHelper.IsWithin(temp, _workingMatrixSize.Min_X_Value, _workingMatrixSize.Max_X_Value))
             {
                 return false;
             }
 
+            if (!GeneralValidationHelper.IsWithin(y, _workingMatrixSize.Min_Y_Value, _workingMatrixSize.Max_Y_Value))
+            {
+                return false;
+            }
+
+            _currentPosition.Y = y;
             _currentPosition.X = temp;
             _currentPosition.Direction = direction;
 
             return true;
         }
 
-        private bool PocessSouthDirection(int x, int y, Direction direction)// y--
+        public bool ProcessSouthDirection(int x, int y, Direction direction)// y--
         {
-            var temp = _currentPosition.Y - y;
+           // int temp = _currentPosition.Y - y;
+            int temp = y;
 
             if (!GeneralValidationHelper.IsWithin(temp, _workingMatrixSize.Min_Y_Value, _workingMatrixSize.Max_Y_Value))
             {
                 return false;
             }
 
+            if (!GeneralValidationHelper.IsWithin(x, _workingMatrixSize.Min_X_Value, _workingMatrixSize.Max_X_Value))
+            {
+                return false;
+            }
+
+            _currentPosition.X = x;
             _currentPosition.Y = temp;
             _currentPosition.Direction = direction;
             return true;
         }
 
-        private bool PocessWestDirection(int x, int y, Direction direction) //x--
+        public bool ProcessWestDirection(int x, int y, Direction direction) //x--
         {
-
-            var temp = _currentPosition.X -  x;
+            //int temp = _currentPosition.X -  x;
+            int temp = x;
+            if (_setupPostionFirstTime)
 
             if (!GeneralValidationHelper.IsWithin(temp, _workingMatrixSize.Min_X_Value, _workingMatrixSize.Max_X_Value))
             {
                 return false;
             }
 
+            if (!GeneralValidationHelper.IsWithin(y, _workingMatrixSize.Min_Y_Value, _workingMatrixSize.Max_Y_Value))
+            {
+                return false;
+            }
+
+            _currentPosition.Y = y;
             _currentPosition.X = temp;
             _currentPosition.Direction = direction;
             return true;

@@ -1,5 +1,4 @@
 ﻿
-
 namespace Robot.Common.Models
 {
 
@@ -7,5 +6,15 @@ namespace Robot.Common.Models
     {
         public int X { get; set; }
         public int Y { get; set; }
+
+        public Position()
+        {
+
+        }
+        public Position(int x, int y)
+        {
+            X = x;
+            Y = y;
+        }
     }
 }

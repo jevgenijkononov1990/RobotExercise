@@ -16,7 +16,7 @@ namespace Robot.Infrastructure.StateMachine.States.Moves
 
         public (bool isSuccess, RobotResponse robotResponse) ProcessState(RobotCommand robotCommand, MatrixSize matrixSize = null)
         {
-            if (robotCommand == null || matrixSize == null || robotCommand.MoveTo == null)
+            if (robotCommand == null  || robotCommand.MoveTo == null)
             {
                 return (false, null);
             }

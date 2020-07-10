@@ -21,8 +21,6 @@ namespace Robot.Infrastructure.StateMachine
                 ?? throw new ArgumentNullException($"{GetType().Name} {RobotConstantsValues.ConstructorInitFailure} {nameof(locationService)}");
         }
 
-
-
         public IState Build(RobotCommandType commandType)
         {
             if(!Enum.IsDefined(typeof(RobotCommandType), commandType))
@@ -36,7 +34,8 @@ namespace Robot.Infrastructure.StateMachine
                     return new InitializationState(_locationService);
                 case RobotCommandType.Move:
                     return new MoveState(_locationService);
-
+                case RobotCommandType.Unknown:
+                    break;
             }
 
             throw new NotImplementedException();

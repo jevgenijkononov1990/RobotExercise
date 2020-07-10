@@ -21,6 +21,8 @@ namespace Robot.Infrastructure.RobotService
         private readonly IRobotRepoSettings _robotSettings;
         private readonly IRobotStateMachineFactory  _robotStateMachine;
         private RobotConfig _robotConfig;
+        private RobotPosition _currentPosition { get; set; }
+
 
         public MainRobotService(ICommunicationHandler communicationHandler, IRobotRepoSettings robotSettings, IRobotStateMachineFactory robotStateMachine)
         {
@@ -64,6 +66,11 @@ namespace Robot.Infrastructure.RobotService
 
                 var cmdResult = _robotStateMachine.Build(RobotCommandType.Initialization).ProcessState(command, _robotConfig.MatrixSize);
 
+                if (cmdResult.isSuccess && cmdResult.robotResponse!=null && cmdResult.robotResponse.CurrentPosition!=null)
+                {
+                    _currentPosition = cmdResult.robotResponse.CurrentPosition;
+                }
+
                 _log.Message(LogLevel.Info, cmdResult.isSuccess ? $"{RobotCommandType.Initialization} Success" : $"{RobotCommandType.Initialization} Failure");
 
                 return cmdResult.isSuccess;
@@ -90,12 +97,13 @@ namespace Robot.Infrastructure.RobotService
                 var consoleLineInput = Console.ReadLine();
                 try
                 {
-                    var response = _communicationHandler.ConvertInputToCommandList(consoleLineInput);
+                    var response = _communicationHandler.ConvertInputToCommandList(consoleLineInput, _currentPosition);
 
                     if (response.success)
                     {
                         if( response.robotCommands != null && response.robotCommands.Count > 0)
                         {
+                            Console.WriteLine($"Robot tries to handle command");
                             HandleRobotCommands(response.robotCommands);
                         }
                     }
@@ -120,11 +128,13 @@ namespace Robot.Infrastructure.RobotService
                 cmd.QueueId = counter;
                 try
                 {
+                    Console.WriteLine($"Request command:{cmd.Type}: Direction:{cmd.CurentDirection} request new Position({cmd.MoveTo.X}:{cmd.MoveTo.Y})");
                     var result = _robotStateMachine.Build(cmd.Type).ProcessState(cmd);
 
                     if (result.isSuccess && result.robotResponse !=null)
                     {
-                        Console.WriteLine($"Success! Position was changed to: [{result.robotResponse.CurrentPosition.X}:{result.robotResponse?.CurrentPosition.X}:{result.robotResponse?.CurrentPosition.Direction}]");
+                        _currentPosition = result.robotResponse.CurrentPosition;
+                        Console.WriteLine($"Success! Position was changed to: [{result.robotResponse.CurrentPosition.X}:{result.robotResponse?.CurrentPosition.Y}:{result.robotResponse?.CurrentPosition.Direction}]");
                     }
                     else
                     {
@@ -133,8 +143,8 @@ namespace Robot.Infrastructure.RobotService
                 }
                 catch (Exception ex)
                 {
-                    _log.Exception(ex, $"Robot command critical failure: {JsonConvert.SerializeObject(cmd)}");
-                    Console.WriteLine($"{RobotConstantsValues.CommandFailure}: {JsonConvert.SerializeObject(cmd)}");
+                    _log.Exception(ex, $"Robot command critical failure");
+                    Console.WriteLine($"{RobotConstantsValues.CommandFailure}");
                 }
 
                 counter++;
