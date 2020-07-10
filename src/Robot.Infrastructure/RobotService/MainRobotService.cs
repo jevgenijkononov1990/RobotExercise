@@ -34,7 +34,7 @@ namespace Robot.Infrastructure.RobotService
                 ?? throw new ArgumentNullException($"{GetType().Name} {RobotConstantsValues.ConstructorInitFailure} {nameof(robotStateMachine)}");
         }
 
-        public bool InitializeFramework()
+        public bool OsInitialization()
         {
             try
             {
@@ -46,35 +46,34 @@ namespace Robot.Infrastructure.RobotService
                     _robotConfig = RobotConstantsValues.RobotDefaultCongifs;
                 }
 
-                Console.WriteLine($"Robot {_robotConfig.Name} init success!");
+                Console.WriteLine($"Robot {_robotConfig.Name} settings read finish!");
                 Console.WriteLine($"Start position :---> [{ _robotConfig.Position.X}:{ _robotConfig.Position.Y}:{ _robotConfig.Position.Direction}]");
                 Console.WriteLine($"Matrix settings :---> [{ _robotConfig.MatrixSize.Max_X_Value}:{ _robotConfig.MatrixSize.Max_Y_Value}]");
 
-                RobotCommandView robotView = new RobotCommandView
+                RobotCommand command = new RobotCommand
                 {
-                    OriginalText = "Init",
                     QueueId = 0, 
-                    Command = RobotCommand.Initialization,
+                    Type = RobotCommandType.Initialization,
                     CurentDirection = _robotConfig.Position.Direction,
-                    MoveTo =  new MatrixLocation
+                    MoveTo =  new Position
                     {
                         X = _robotConfig.Position.X,
                         Y = _robotConfig.Position.Y,
                     } 
-
                 };
-                var cmdResult = _robotStateMachine.Build(robotView.Command).MakeStep(robotView, new MatrixSize { });
-        
-    }
+
+                var cmdResult = _robotStateMachine.Build(RobotCommandType.Initialization).Move(command, _robotConfig.MatrixSize);
+
+                _log.Message(LogLevel.Info, cmdResult.isSuccess ? $"{RobotCommandType.Initialization} Success" : $"{RobotCommandType.Initialization} Failure");
+
+                return cmdResult.isSuccess;
+            }
             catch (Exception ex)
             {
-                Console.WriteLine(RobotConstantsValues.CriticalErrorOccuredMissionWillContinue);
+                Console.WriteLine(RobotConstantsValues.CriticalErrorOccuredMissionWillNotContinue);
                 _log.Exception(ex);
+                return false;
             }
-
-            //update state machine
-
-            return true;
         }
 
         public async Task StartCommunicationThreadAsync(CancellationTokenSource cancellationTokenSource)
@@ -91,18 +90,18 @@ namespace Robot.Infrastructure.RobotService
                 var consoleLineInput = Console.ReadLine();
                 try
                 {
-                    var response = _communicationHandler.ConvertInputToCommand(consoleLineInput);
+                    var response = _communicationHandler.ConvertInputToCommandList(consoleLineInput);
 
                     if (response.success)
                     {
                         if( response.robotCommands != null && response.robotCommands.Count > 0)
                         {
-                            ProceedRobotCommands(response.robotCommands);
+                            HandleRobotCommands(response.robotCommands);
                         }
                     }
                     else
                     {
-                        _log.Message(LogLevel.Warn, "Input command failure. Please try again.");
+                        _log.Message(LogLevel.Warn, "Input decode failure.");
                     }
                 }
                 catch (Exception ex)
@@ -113,7 +112,7 @@ namespace Robot.Infrastructure.RobotService
             }
         }
 
-        private void ProceedRobotCommands(List<RobotCommandView> cmdList)
+        private void HandleRobotCommands(List<RobotCommand> cmdList)
         {
             int counter = 0;
             foreach(var item in cmdList)
@@ -121,7 +120,7 @@ namespace Robot.Infrastructure.RobotService
                 item.QueueId = counter;
                 try
                 {
-                    var result = _robotStateMachine.Build(item.Command).MakeStep(item);
+                    var result = _robotStateMachine.Build(item.Type).Move(item);
 
                     if (result.isSuccess && result.currentPosition !=null)
                     {

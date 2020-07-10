@@ -2,22 +2,22 @@
 using Robot.Common.Models;
 using Robot.Infrastructure.StateMachine.LocationControl;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Robot.Infrastructure.StateMachine.States
+
+namespace Robot.Infrastructure.StateMachine.States.Rotation
 {
-    public class InitializationStep : IStateStep
+    public class LeftRotationMove : IMove
     {
+
         private readonly IRobotLocationService _locationService;
 
-        public InitializationStep(IRobotLocationService locationService)
+        public LeftRotationMove(IRobotLocationService locationService)
         {
             _locationService = locationService ?? throw new ArgumentNullException($"{GetType().Name} {RobotConstantsValues.ConstructorInitFailure} {nameof(locationService)}");
 
         }
 
-        public (bool isSuccess, RobotPosition currentPosition) MakeStep(RobotCommandView robotCommandView, MatrixSize matrixSize = null)
+        (bool isSuccess, RobotPosition currentPosition) IMove.Move(RobotCommand robotCommandView, MatrixSize matrixSize)
         {
             throw new NotImplementedException();
         }

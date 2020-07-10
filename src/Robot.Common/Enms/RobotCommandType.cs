@@ -1,7 +1,7 @@
 ﻿
 namespace Robot.Common.Enms
 {
-    public enum RobotCommand
+    public enum RobotCommandType
     {
         Initialization,
 

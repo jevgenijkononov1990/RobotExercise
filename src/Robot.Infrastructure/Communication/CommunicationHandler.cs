@@ -17,7 +17,7 @@ namespace Robot.Infrastructure.Communication
 
         }
 
-        public (bool success, List<RobotCommandView> robotCommands) ConvertInputToCommand(string txtToCmd)
+        public (bool success, List<RobotCommand> robotCommands) ConvertInputToCommandList(string txtToCmd)
         {
             throw new NotImplementedException();
         }

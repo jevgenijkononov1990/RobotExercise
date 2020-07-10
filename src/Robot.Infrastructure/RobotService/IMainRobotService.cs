@@ -5,7 +5,7 @@ namespace Robot.Infrastructure.RobotService
 {
     public interface IMainRobotService
     {
-        bool InitializeFramework();
+        bool OsInitialization();
         Task StartCommunicationThreadAsync(CancellationTokenSource cancellationTokenSource);
     }
 }

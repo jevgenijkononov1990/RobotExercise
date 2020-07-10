@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Robot.Common;
 using Robot.Common.Logging;
 using Robot.Infrastructure.RobotService;
 using System;
@@ -21,6 +22,9 @@ namespace Robot.ConsoleApp
                 Console.CancelKeyPress += new ConsoleCancelEventHandler(Console_CancelKeyPress);
                 InitRobotFramework();
                 Console.CancelKeyPress -= new ConsoleCancelEventHandler(Console_CancelKeyPress);
+
+                Console.WriteLine(RobotConstantsValues.RobotProgramLastMessage);
+                Thread.Sleep(5000);
             }
             catch(Exception ex)
             {
@@ -42,7 +46,13 @@ namespace Robot.ConsoleApp
         static void InitRobotFramework()
         {
             var robot = _serviceProvider.GetService<IMainRobotService>();
-            robot.InitializeFramework();
+
+            if (!robot.OsInitialization())
+            {
+                Console.WriteLine("Robot Operating System initialization failure");
+                _log.Message(LogLevel.Fatal, "Critical error in os");
+                return;
+            }
             robot.StartCommunicationThreadAsync(_cancellationTokenSource);
         }
 

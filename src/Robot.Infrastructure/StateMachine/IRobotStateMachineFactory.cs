@@ -5,6 +5,6 @@ namespace Robot.Infrastructure.StateMachine
 {
     public interface IRobotStateMachineFactory
     {
-        IStateStep Build(RobotCommand stepCommand);
+        IMove Build(RobotCommandType commandType);
     }
 }

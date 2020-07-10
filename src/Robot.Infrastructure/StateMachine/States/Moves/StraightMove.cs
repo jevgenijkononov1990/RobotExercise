@@ -3,19 +3,18 @@ using Robot.Common.Models;
 using Robot.Infrastructure.StateMachine.LocationControl;
 using System;
 
-namespace Robot.Infrastructure.StateMachine.States.Axes
+namespace Robot.Infrastructure.StateMachine.States.Moves
 {
-    public class HorizontalStep : IStateStep
+    public class StraightMove : IMove
     {
         private readonly IRobotLocationService _locationService;
 
-        public HorizontalStep(IRobotLocationService locationService)
+        public StraightMove(IRobotLocationService locationService)
         {
             _locationService = locationService ?? throw new ArgumentNullException($"{GetType().Name} {RobotConstantsValues.ConstructorInitFailure} {nameof(locationService)}");
-
         }
 
-        (bool isSuccess, RobotPosition currentPosition) IStateStep.MakeStep(RobotCommandView robotCommandView, MatrixSize matrixSize)
+        (bool isSuccess, RobotPosition currentPosition) IMove.Move(RobotCommand robotCommandView, MatrixSize matrixSize)
         {
             throw new NotImplementedException();
         }

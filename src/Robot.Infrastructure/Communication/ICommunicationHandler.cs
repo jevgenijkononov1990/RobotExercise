@@ -6,6 +6,6 @@ namespace Robot.Infrastructure.Communication
 {
     public interface ICommunicationHandler
     {
-        (bool success, List<RobotCommandView> robotCommands) ConvertInputToCommand(string txtToConvert);
+        (bool success, List<RobotCommand> robotCommands) ConvertInputToCommandList(string txtToConvert);
     }
 }

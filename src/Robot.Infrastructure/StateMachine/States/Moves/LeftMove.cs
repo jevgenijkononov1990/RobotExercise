@@ -7,18 +7,18 @@ using System.Text;
 
 namespace Robot.Infrastructure.StateMachine.States.Moves
 {
-    public class MoveLeftState : IStateStep
+    public class LeftMove : IMove
     {
 
         private readonly IRobotLocationService _locationService;
 
-        public MoveLeftState(IRobotLocationService locationService)
+        public LeftMove(IRobotLocationService locationService)
         {
             _locationService = locationService ?? throw new ArgumentNullException($"{GetType().Name} {RobotConstantsValues.ConstructorInitFailure} {nameof(locationService)}");
 
         }
 
-        (bool isSuccess, RobotPosition currentPosition) IStateStep.MakeStep(RobotCommandView robotCommandView, MatrixSize matrixSize)
+        (bool isSuccess, RobotPosition currentPosition) IMove.Move(RobotCommand robotCommandView, MatrixSize matrixSize)
         {
             throw new NotImplementedException();
         }
