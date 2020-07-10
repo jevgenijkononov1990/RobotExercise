@@ -62,7 +62,7 @@ namespace Robot.Infrastructure.RobotService
                     } 
                 };
 
-                var cmdResult = _robotStateMachine.Build(RobotCommandType.Initialization).Move(command, _robotConfig.MatrixSize);
+                var cmdResult = _robotStateMachine.Build(RobotCommandType.Initialization).ProcessState(command, _robotConfig.MatrixSize);
 
                 _log.Message(LogLevel.Info, cmdResult.isSuccess ? $"{RobotCommandType.Initialization} Success" : $"{RobotCommandType.Initialization} Failure");
 
@@ -115,16 +115,16 @@ namespace Robot.Infrastructure.RobotService
         private void HandleRobotCommands(List<RobotCommand> cmdList)
         {
             int counter = 0;
-            foreach(var item in cmdList)
+            foreach(var cmd in cmdList)
             {
-                item.QueueId = counter;
+                cmd.QueueId = counter;
                 try
                 {
-                    var result = _robotStateMachine.Build(item.Type).Move(item);
+                    var result = _robotStateMachine.Build(cmd.Type).ProcessState(cmd);
 
-                    if (result.isSuccess && result.currentPosition !=null)
+                    if (result.isSuccess && result.robotResponse !=null)
                     {
-                        Console.WriteLine($"Success! Position was changed to: [{result.currentPosition.X}:{result.currentPosition.X}:{result.currentPosition.Direction}]");
+                        Console.WriteLine($"Success! Position was changed to: [{result.robotResponse.CurrentPosition.X}:{result.robotResponse?.CurrentPosition.X}:{result.robotResponse?.CurrentPosition.Direction}]");
                     }
                     else
                     {
@@ -133,8 +133,8 @@ namespace Robot.Infrastructure.RobotService
                 }
                 catch (Exception ex)
                 {
-                    _log.Exception(ex, $"Robot command critical failure: {JsonConvert.SerializeObject(item)}");
-                    Console.WriteLine($"{RobotConstantsValues.CommandFailure}: {JsonConvert.SerializeObject(item)}");
+                    _log.Exception(ex, $"Robot command critical failure: {JsonConvert.SerializeObject(cmd)}");
+                    Console.WriteLine($"{RobotConstantsValues.CommandFailure}: {JsonConvert.SerializeObject(cmd)}");
                 }
 
                 counter++;

@@ -13,5 +13,10 @@ namespace Robot.Common
             else
             { return false; }
         }
+
+        public static bool IsWithin(this int value, int minimum, int maximum)
+        {
+            return value >= minimum && value <= maximum;
+        }
     }
 }
